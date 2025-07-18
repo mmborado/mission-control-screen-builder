@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -22,8 +23,8 @@ type Telemetry struct {
 
 var batteryLevel float64 = 100
 
-func generateMockTelemetryWithTime(now string) []Telemetry {
-	drain := 0.5 + rand.Float64()*1.5
+func generateMockTelemetryWithTime(now string, r *rand.Rand) []Telemetry {
+	drain := 0.5 + r.Float64()*1.5
 	batteryLevel -= drain
 	if batteryLevel < 10 {
 		batteryLevel = 100
@@ -36,11 +37,11 @@ func generateMockTelemetryWithTime(now string) []Telemetry {
 		batteryStatus = "warning"
 	}
 
-	batteryVoltage := 14.3 + rand.Float64()*0.4
-	solarInput := 60 + rand.Float64()*40
-	consumption := 70 + rand.Float64()*30
-	cpuTemp := 38 + rand.Float64()*12
-	signalStrength := 60 + rand.Float64()*30
+	batteryVoltage := 14.3 + r.Float64()*0.4
+	solarInput := 60 + r.Float64()*40
+	consumption := 70 + r.Float64()*30
+	cpuTemp := 38 + r.Float64()*12
+	signalStrength := 60 + r.Float64()*30
 
 	thermalStatus := "nominal"
 	if cpuTemp > 52 {
@@ -56,7 +57,7 @@ func generateMockTelemetryWithTime(now string) []Telemetry {
 		signalStatus = "warning"
 	}
 
-	if rand.Float64() < 0.01 {
+	if r.Float64() < 0.01 {
 		cpuTemp *= 1.3
 		thermalStatus = "warning"
 	}
@@ -136,11 +137,11 @@ func seedTelemetry(db *sql.DB) error {
 	defer stmt.Close()
 
 	batteryLevel = 100
-	rand.Seed(time.Now().UnixNano())
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	for t := start; t.Before(time.Now()); t = t.Add(interval) {
 		now := t.UTC().Format(time.RFC3339)
-		points := generateMockTelemetryWithTime(now)
+		points := generateMockTelemetryWithTime(now, r)
 
 		for _, p := range points {
 			_, err := stmt.Exec(p.Timestamp, p.Subsystem, p.Metric, p.Value, p.Unit, p.Status)
@@ -185,9 +186,13 @@ func ensureCommandsTable(db *sql.DB) error {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env file not found, falling back to system env vars")
+	}
+
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://missioncontrol:password123@localhost:5432/missioncontrol_demo?sslmode=disable"
+		log.Fatalf("Failed to fetch DATABASE_URL variable")
 	}
 
 	db, err := sql.Open("postgres", dbURL)
@@ -212,5 +217,5 @@ func main() {
 		log.Fatalf("Seeding failed: %v", err)
 	}
 
-	fmt.Println("Telemetry data seeded successfully.")
+	fmt.Println("Telemetry data seeded successfully123.")
 }
