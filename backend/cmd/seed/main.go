@@ -23,7 +23,6 @@ type Telemetry struct {
 var batteryLevel float64 = 100
 
 func generateMockTelemetryWithTime(now string) []Telemetry {
-	// Simulate battery drain
 	drain := 0.5 + rand.Float64()*1.5
 	batteryLevel -= drain
 	if batteryLevel < 10 {
@@ -57,7 +56,6 @@ func generateMockTelemetryWithTime(now string) []Telemetry {
 		signalStatus = "warning"
 	}
 
-	// Optional: rare anomaly spike example
 	if rand.Float64() < 0.01 {
 		cpuTemp *= 1.3
 		thermalStatus = "warning"
@@ -120,7 +118,7 @@ func roundToOneDecimal(val float64) float64 {
 }
 
 func seedTelemetry(db *sql.DB) error {
-	start := time.Now().Add(-7 * 24 * time.Hour) // 7 days ago
+	start := time.Now().Add(-7 * 24 * time.Hour)
 	interval := time.Minute
 
 	tx, err := db.Begin()
@@ -155,6 +153,37 @@ func seedTelemetry(db *sql.DB) error {
 	return tx.Commit()
 }
 
+func ensureTelemetryTable(db *sql.DB) error {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS telemetry (
+			id SERIAL PRIMARY KEY,
+			timestamp TIMESTAMPTZ NOT NULL,
+			subsystem TEXT NOT NULL,
+			metric TEXT NOT NULL,
+			value DOUBLE PRECISION NOT NULL,
+			unit TEXT NOT NULL,
+			status TEXT NOT NULL
+		);
+
+		CREATE UNIQUE INDEX IF NOT EXISTS idx_telemetry_unique ON telemetry (timestamp, subsystem, metric);
+	`)
+	return err
+}
+
+func ensureCommandsTable(db *sql.DB) error {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS commands (
+			id TEXT PRIMARY KEY,
+			type TEXT NOT NULL,
+			payload TEXT,
+			critical BOOLEAN NOT NULL DEFAULT false,
+			status TEXT NOT NULL,
+			timestamp TIMESTAMPTZ NOT NULL
+		)
+	`)
+	return err
+}
+
 func main() {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
@@ -167,10 +196,21 @@ func main() {
 	}
 	defer db.Close()
 
+
+	err = ensureTelemetryTable(db)
+	if err != nil {
+		log.Fatalf("Failed to create telemetry table: %v", err)
+	}
+
+	err = ensureCommandsTable(db);
+	if err != nil {
+		log.Fatalf("Failed to ensure commands table: %v", err)
+	}
+
 	err = seedTelemetry(db)
 	if err != nil {
 		log.Fatalf("Seeding failed: %v", err)
 	}
 
-	fmt.Println("✅ Telemetry data seeded successfully.")
+	fmt.Println("Telemetry data seeded successfully.")
 }

@@ -23,16 +23,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to connect to DB:", err)
 	}
-
-	err = ensureTelemetryTable(db)
-	if err != nil {
-		log.Fatalf("Failed to create telemetry table: %v", err)
-	}
-
-	err = ensureCommandsTable(db);
-	if err != nil {
-		log.Fatalf("Failed to ensure commands table: %v", err)
-	}
 	
 	defer db.Close()
 
