@@ -17,8 +17,10 @@ export const CommandHistoryPanel = ({ onRemove, widgetId }: Props) => {
       const res = await fetch("http://localhost:8080/api/commands");
       if (!res.ok) {
         toast.error("Failed to fetch command history");
+        return [];
       }
-      return res.json();
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
     refetchInterval: 10000,
   });
@@ -54,7 +56,11 @@ export const CommandHistoryPanel = ({ onRemove, widgetId }: Props) => {
           </div>
         </CardTitle>
       </CardHeader>
-
+      {!isLoading && commands.length === 0 && (
+        <div className='flex items-center justify-center h-full'>
+          No commands sent
+        </div>
+      )}
       {isLoading ? (
         <p>Loading...</p>
       ) : (
