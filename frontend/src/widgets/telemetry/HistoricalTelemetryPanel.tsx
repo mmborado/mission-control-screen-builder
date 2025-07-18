@@ -20,7 +20,7 @@ import {
 } from "../../components/ui/select";
 import { Input } from "../../components/ui/input";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "../../components/ui/card";
 
 type TelemetryPoint = {
@@ -34,7 +34,6 @@ const ALL_METRICS = [
   "signal_strength",
   "payload_temp",
   "thermal_level",
-  // add all available telemetry metrics here
 ];
 
 const TIME_RANGES = [
@@ -56,28 +55,26 @@ interface Props {
 }
 
 export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
-  // Selected metrics
   const [metrics, setMetrics] = useState<string[]>([
     "cpu_temp",
     "battery_voltage",
+    "signal_strength",
+    "payload_temp",
+    "thermal_level",
   ]);
 
-  // Time range state
   const [timeRange, setTimeRange] = useState<string>("24h");
-  const [customStart, setCustomStart] = useState<string>(""); // ISO string date-time
+  const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
 
-  // Limit lines state
   const [limitLines, setLimitLines] = useState<LimitLine[]>([
     { metric: "cpu_temp", value: 28, label: "Temp Limit", stroke: "#EF4444" },
   ]);
 
-  // Chart data and loading/error
   const [data, setData] = useState<TelemetryPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Zoom (brush) range
   const [brushStartIndex, setBrushStartIndex] = useState<number | undefined>(
     undefined
   );
@@ -85,14 +82,12 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
     undefined
   );
 
-  // Prepare API query params for time range
   const apiTimeRangeParam = useMemo(() => {
     if (timeRange !== "custom") return timeRange;
     if (customStart && customEnd) return `${customStart},${customEnd}`;
-    return ""; // fallback
+    return "";
   }, [timeRange, customStart, customEnd]);
 
-  // Fetch telemetry data
   useEffect(() => {
     if (!metrics.length) {
       setData([]);
@@ -133,7 +128,6 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
     fetchData();
   }, [metrics, apiTimeRangeParam]);
 
-  // Update brush zoom handlers
   const onBrushChange = (range: any) => {
     if (
       range &&
@@ -145,8 +139,7 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
     }
   };
 
-  // Zoom controls (zoom in/out by changing brush window)
-  const zoomStep = 5;
+  const zoomStep = 100;
   const zoomIn = () => {
     if (brushStartIndex === undefined || brushEndIndex === undefined) return;
     const newStart = Math.min(brushStartIndex + zoomStep, brushEndIndex);
@@ -158,7 +151,6 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
     setBrushStartIndex(newStart);
   };
 
-  // Add a new limit line input
   const addLimitLine = () => {
     if (metrics.length === 0) return;
     setLimitLines((prev) => [
@@ -167,21 +159,18 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
     ]);
   };
 
-  // Update limit line value
   const updateLimitLineValue = (index: number, value: number) => {
     setLimitLines((prev) =>
       prev.map((line, i) => (i === index ? { ...line, value } : line))
     );
   };
 
-  // Update limit line metric
   const updateLimitLineMetric = (index: number, metric: string) => {
     setLimitLines((prev) =>
       prev.map((line, i) => (i === index ? { ...line, metric } : line))
     );
   };
 
-  // Remove limit line
   const removeLimitLine = (index: number) => {
     setLimitLines((prev) => prev.filter((_, i) => i !== index));
   };
@@ -212,7 +201,7 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
           </CardTitle>
         </CardHeader>
         <div className='my-4 flex flex-wrap gap-4 items-center'>
-          <div className='max-h-48 overflow-auto border rounded p-2 bg-gray-800 text-white w-48'>
+          <div className='max-h-48 overflow-auto border rounded p-2 bg-gray-800 text-white w-48 no-drag'>
             {ALL_METRICS.map((option) => (
               <label
                 key={option}
@@ -221,26 +210,26 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
                   type='checkbox'
                   checked={metrics.includes(option)}
                   onChange={() => toggleOption(option)}
-                  className='form-checkbox text-green-500'
+                  className='form-checkbox'
                 />
-                <span>{option}</span>
+                <span className='capitalize'>
+                  {option.replaceAll("_", " ")}
+                </span>
               </label>
             ))}
           </div>
 
-          {/* Time range buttons */}
           <div className='flex space-x-2'>
             {TIME_RANGES.map(({ label, value }) => (
               <Button
                 key={value}
-                variant={timeRange === value ? "default" : "outline"}
+                variant={timeRange === value ? "secondary" : "outline"}
                 onClick={() => setTimeRange(value)}>
                 {label}
               </Button>
             ))}
           </div>
 
-          {/* Custom range inputs */}
           {timeRange === "custom" && (
             <div className='flex space-x-2 items-center'>
               <label className='text-sm'>Start:</label>
@@ -260,7 +249,6 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
           )}
         </div>
 
-        {/* Limit lines controls */}
         <div className='mb-4'>
           <h4 className='mb-2 font-semibold text-white'>Limit Lines</h4>
           {limitLines.map(({ value, label, metric }, i) => (
@@ -268,7 +256,7 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
               <Select
                 value={metric}
                 onValueChange={(val) => updateLimitLineMetric(i, val)}>
-                <SelectTrigger className='w-full'>{metric}</SelectTrigger>
+                <SelectTrigger className='w-1/2'>{metric}</SelectTrigger>
                 <SelectContent>
                   {metrics.map((m) => (
                     <SelectItem key={m} value={m}>
@@ -283,27 +271,35 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
                 onChange={(e) =>
                   updateLimitLineValue(i, Number(e.target.value))
                 }
-                className='w-20'
+                className='w-20 mb-0'
               />
-              <span className='text-white'>{label}</span>
               <Button
-                variant='ghost'
+                variant='outline'
                 onClick={() => removeLimitLine(i)}
                 aria-label='Remove limit line'>
                 ✕
               </Button>
             </div>
           ))}
-          <Button onClick={addLimitLine}>Add Limit Line</Button>
+          <Button variant='secondary' onClick={addLimitLine}>
+            Add Limit Line
+          </Button>
         </div>
 
         {/* Zoom controls */}
-        <div className='mb-4 flex space-x-2'>
-          <Button onClick={zoomIn} disabled={brushStartIndex === undefined}>
-            Zoom In
+        <div className='mb-4 px-8 flex items-center justify-end space-x-2'>
+          <span>Zoom: </span>
+          <Button
+            variant='outline'
+            onClick={zoomIn}
+            disabled={brushStartIndex === undefined}>
+            <Plus />
           </Button>
-          <Button onClick={zoomOut} disabled={brushStartIndex === undefined}>
-            Zoom Out
+          <Button
+            variant='outline'
+            onClick={zoomOut}
+            disabled={brushStartIndex === undefined}>
+            <Minus />
           </Button>
         </div>
 
@@ -315,7 +311,7 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
         ) : data.length === 0 ? (
           <p> No data available for this time range.</p>
         ) : (
-          <ResponsiveContainer width='100%' height={400}>
+          <ResponsiveContainer width='100%' height={400} className='no-drag'>
             <LineChart
               data={data}
               margin={{ top: 10, right: 30, bottom: 20, left: 0 }}>
