@@ -103,7 +103,7 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
         queryParams.set("range", apiTimeRangeParam);
         queryParams.set("metrics", metrics.join(","));
 
-        const domain = import.meta.env.API_URL;
+        const domain = import.meta.env.VITE_API_URL;
         const res = await fetch(
           `${domain}/api/telemetry/historical?${queryParams.toString()}`
         );

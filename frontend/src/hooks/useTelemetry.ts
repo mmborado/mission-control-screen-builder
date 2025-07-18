@@ -13,7 +13,7 @@ export function useTelemetry(): { data: TelemetryDatum[] } {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const domain = import.meta.env.DOMAIN;
+    const domain = import.meta.env.VITE_DOMAIN;
     const ws = new WebSocket(`ws://${domain}/ws/telemetry`);
 
     wsRef.current = ws;

@@ -9,7 +9,7 @@ export function usePowerTelemetry() {
   });
 
   useEffect(() => {
-    const domain = import.meta.env.DOMAIN;
+    const domain = import.meta.env.VITE_DOMAIN;
     const ws = new WebSocket(`ws://${domain}/ws/telemetry`);
 
     ws.onmessage = (event) => {
