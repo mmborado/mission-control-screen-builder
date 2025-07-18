@@ -22,7 +22,6 @@ Open your terminal and run:
 
 ```bash
 git clone https://github.com/mmborado/mission-control.git
-cd mission-control
 cd backend
 ```
 
