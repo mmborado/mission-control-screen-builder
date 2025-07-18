@@ -20,6 +20,7 @@ Make sure the following are installed:
 
 ```bash
 git clone https://github.com/mmborado/mission-control-screen-builder.git
+cd mission-control-screen-builder
 cd frontend
 ```
 
