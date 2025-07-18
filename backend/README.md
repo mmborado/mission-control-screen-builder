@@ -22,6 +22,7 @@ Open your terminal and run:
 
 ```bash
 git clone https://github.com/mmborado/mission-control.git
+cd mission-control-screen-builder
 cd backend
 ```
 
@@ -114,7 +115,7 @@ This step ensures your app has initial data for testing.
 Run the Go backend:
 
 ```bash
-go run main.go db_setup.go telemetry.go websocket.go
+go run main.go telemetry.go websocket.go
 ```
 
 You should see:
