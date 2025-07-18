@@ -9,7 +9,8 @@ export function usePowerTelemetry() {
   });
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws/telemetry");
+    const domain = import.meta.env.DOMAIN;
+    const ws = new WebSocket(`ws://${domain}/ws/telemetry`);
 
     ws.onmessage = (event) => {
       try {

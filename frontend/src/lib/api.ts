@@ -2,7 +2,8 @@
 import type { CommandEntry } from "../store/commands";
 
 export async function sendCommandToAPI(cmd: CommandEntry) {
-  const res = await fetch("http://localhost:8080/api/commands", {
+  const apiUrl = import.meta.env.API_URL;
+  const res = await fetch(`${apiUrl}/api/commands`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

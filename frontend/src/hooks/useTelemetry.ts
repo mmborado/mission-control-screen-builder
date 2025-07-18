@@ -13,7 +13,9 @@ export function useTelemetry(): { data: TelemetryDatum[] } {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws/telemetry");
+    const domain = import.meta.env.DOMAIN;
+    const ws = new WebSocket(`ws://${domain}/ws/telemetry`);
+
     wsRef.current = ws;
 
     ws.onmessage = (event) => {

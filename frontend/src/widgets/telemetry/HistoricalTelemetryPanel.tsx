@@ -103,8 +103,9 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
         queryParams.set("range", apiTimeRangeParam);
         queryParams.set("metrics", metrics.join(","));
 
+        const domain = import.meta.env.API_URL;
         const res = await fetch(
-          `http://localhost:8080/api/telemetry/historical?${queryParams.toString()}`
+          `${domain}/api/telemetry/historical?${queryParams.toString()}`
         );
         if (!res.ok) throw new Error(`Server error: ${res.statusText}`);
 
