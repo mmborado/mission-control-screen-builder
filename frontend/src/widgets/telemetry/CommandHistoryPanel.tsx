@@ -14,7 +14,8 @@ export const CommandHistoryPanel = ({ onRemove, widgetId }: Props) => {
   const { data: commands = [], isLoading } = useQuery<CommandEntry[], Error>({
     queryKey: ["commandHistory"],
     queryFn: async (): Promise<CommandEntry[]> => {
-      const res = await fetch("http://localhost:8080/api/commands");
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${apiUrl}/api/commands`);
       if (!res.ok) {
         toast.error("Failed to fetch command history");
         return [];
