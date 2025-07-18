@@ -251,7 +251,7 @@ export function HistoricalTelemetryPanel({ onRemove, widgetId }: Props) {
 
         <div className='mb-4'>
           <h4 className='mb-2 font-semibold text-white'>Limit Lines</h4>
-          {limitLines.map(({ value, label, metric }, i) => (
+          {limitLines.map(({ value, metric }, i) => (
             <div key={i} className='flex items-center space-x-2 mb-2'>
               <Select
                 value={metric}
