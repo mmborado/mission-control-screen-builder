@@ -40,8 +40,6 @@ DATABASE_URL=postgres://missioncontrol:yourpassword@localhost:5432/missioncontro
 FRONTEND_URL=http://localhost:5173
 ```
 
-> Replace `yourpassword` with your actual PostgreSQL password.
-
 ---
 
 ### Step 3: Install Go Dependencies
@@ -95,6 +93,9 @@ Then update your `.env` file password accordingly:
 ```env
 DATABASE_URL=postgres://missioncontrol:yourpassword@localhost:5432/missioncontrol_demo?sslmode=disable
 ```
+
+> Replace `missioncontrol` with new user (if you changed it).
+> Replace `yourpassword` with new user password.
 
 ---
 
