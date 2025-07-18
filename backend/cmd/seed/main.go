@@ -217,5 +217,5 @@ func main() {
 		log.Fatalf("Seeding failed: %v", err)
 	}
 
-	fmt.Println("Telemetry data seeded successfully123.")
+	fmt.Println("Telemetry data seeded successfully.")
 }
