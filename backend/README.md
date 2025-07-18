@@ -21,7 +21,7 @@ Make sure the following are installed:
 Open your terminal and run:
 
 ```bash
-git clone https://github.com/mmborado/mission-control.git
+git clone https://github.com/mmborado/mission-control-screen-builder.git
 cd mission-control-screen-builder
 cd backend
 ```
