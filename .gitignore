@@ -1,0 +1,15 @@
+# Node frontend
+node_modules/
+dist/
+frontend/.next/
+frontend/.turbo/
+frontend/build/
+
+# Go backend
+backend/bin/
+*.exe
+*.out
+
+# General
+.DS_Store
+*.log
