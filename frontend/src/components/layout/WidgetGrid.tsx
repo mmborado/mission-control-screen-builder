@@ -32,8 +32,6 @@ export function WidgetGrid() {
         return;
       }
 
-      const WidgetComponent = WIDGET_PROPS[item.widgetType];
-      console.log(WidgetComponent);
       const relativeX = clientOffset.x - gridRect.left;
       const relativeY = clientOffset.y - gridRect.top;
 
