@@ -1,6 +1,7 @@
 import { useDrag } from "react-dnd";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
+import { useLayoutStore } from "../../store/layout";
 
 const DRAG_ITEM_TYPE = "SIDEBAR_WIDGET";
 
@@ -59,6 +60,12 @@ const SidebarItem = ({
 };
 
 export function Sidebar() {
+  const { clearLayout } = useLayoutStore();
+
+  const clearDashboard = () => {
+    clearLayout();
+  };
+
   return (
     <div className='h-full bg-gray-800 text-white p-2 shadow-[6px_0_8px_-2px_rgba(0,0,0,0.6)]'>
       <h2 className='text-xl font-bold pb-2 text-center border-b-2 border-primary'>
@@ -70,6 +77,12 @@ export function Sidebar() {
         {WIDGETS.map((widget) => (
           <SidebarItem key={widget.widgetType} item={widget} />
         ))}
+        <div className='py-4'>
+          <Button variant='outline' className='w-full' onClick={clearDashboard}>
+            {" "}
+            Clear Dashboard{" "}
+          </Button>
+        </div>
       </div>
     </div>
   );

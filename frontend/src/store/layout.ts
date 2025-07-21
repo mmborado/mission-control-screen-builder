@@ -46,6 +46,7 @@ interface LayoutState {
   widgets: WidgetInstance[];
   initLayout: () => void;
   setLayout: (layout: Layout[]) => void;
+  clearLayout: () => void;
   addWidget: (
     type: WidgetInstance["type"],
     position?: { x: number; y: number }
@@ -70,6 +71,10 @@ export const useLayoutStore = create<LayoutState>((set, get) => ({
       saveLayoutToStorage(layout, widgets);
     }
     set({ layout });
+  },
+  clearLayout: () => {
+    saveLayoutToStorage([], []);
+    set({ layout: [], widgets: [] });
   },
   addWidget: (type, position = { x: 0, y: Infinity }) => {
     const id = `${type.toLowerCase()}-${idCounter++}`;
